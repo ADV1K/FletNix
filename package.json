@@ -1,0 +1,21 @@
+{
+  "name": "fletnix",
+  "version": "1.0.0",
+  "description": "Full-stack Netflix title explorer with Angular SSR and Node.js backend",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "start": "npm run start --workspace=backend",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}
+
