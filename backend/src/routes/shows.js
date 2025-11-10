@@ -1,11 +1,11 @@
 import express from 'express';
 import Show from '../models/Show.js';
-import { mockAuth } from '../utils/auth-mock.js';
+import { authenticateToken } from '../utils/auth.js';
 
 const router = express.Router();
 
 // Get all shows with pagination, search, and filters
-router.get('/', mockAuth, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const user = req.user;
     const page = parseInt(req.query.page) || 1;
@@ -63,7 +63,7 @@ router.get('/', mockAuth, async (req, res) => {
 });
 
 // Get show by ID
-router.get('/:id', mockAuth, async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const user = req.user;
     // Try to find by MongoDB _id first, then by show_id
@@ -89,7 +89,7 @@ router.get('/:id', mockAuth, async (req, res) => {
 });
 
 // Get recommendations based on show genres
-router.get('/:id/recommendations', mockAuth, async (req, res) => {
+router.get('/:id/recommendations', authenticateToken, async (req, res) => {
   try {
     const user = req.user;
     // Try to find by MongoDB _id first, then by show_id

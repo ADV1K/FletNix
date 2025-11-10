@@ -9,19 +9,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/fletnix';
-const CSV_PATH = process.env.CSV_PATH || path.join(__dirname, '../../netflix_titles.csv');
+// In Docker, CSV is mounted at /app/netflix_titles.csv, otherwise use relative path
+const CSV_PATH = process.env.CSV_PATH || (process.env.NODE_ENV === 'production' 
+  ? '/app/netflix_titles.csv' 
+  : path.join(__dirname, '../../netflix_titles.csv'));
 
 async function seedDatabase() {
   try {
-    // Connect to MongoDB
-    await mongoose.connect(MONGO_URI);
-    console.log('Connected to MongoDB for seeding');
-
+    // Don't connect/disconnect - use existing connection from app.js
     // Check if data already exists
     const count = await Show.countDocuments();
     if (count > 0) {
       console.log('Database already has data, skipping seed');
-      await mongoose.disconnect();
       return;
     }
 
@@ -78,25 +77,28 @@ async function seedDatabase() {
     }
 
     console.log(`Successfully seeded ${shows.length} shows`);
-    await mongoose.disconnect();
   } catch (error) {
     console.error('Seeding error:', error);
-    await mongoose.disconnect();
     throw error;
   }
 }
 
-// Run if called directly
+// Run if called directly (standalone mode - needs its own connection)
 if (import.meta.url === `file://${path.resolve(process.argv[1])}` || process.argv[1]?.endsWith('seed.js')) {
-  seedDatabase()
-    .then(() => {
+  (async () => {
+    try {
+      await mongoose.connect(MONGO_URI);
+      console.log('Connected to MongoDB for seeding');
+      await seedDatabase();
+      await mongoose.disconnect();
       console.log('Seeding completed');
       process.exit(0);
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error('Seeding failed:', error);
+      await mongoose.disconnect().catch(() => {});
       process.exit(1);
-    });
+    }
+  })();
 }
 
 export { seedDatabase };

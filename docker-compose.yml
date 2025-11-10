@@ -44,7 +44,7 @@ services:
       dockerfile: Dockerfile
     container_name: fletnix-frontend
     ports:
-      - "8080:4200"
+      - "8080:80"
     depends_on:
       - backend
     networks:
