@@ -27,17 +27,34 @@ export class AuthService {
       email,
       password,
       age,
-    }, { withCredentials: true });
+    }, { withCredentials: true }).pipe(
+      tap((response) => {
+        // Store token in localStorage for frontend auth guard
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        }
+      })
+    );
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, {
       email,
       password,
-    }, { withCredentials: true });
+    }, { withCredentials: true }).pipe(
+      tap((response) => {
+        // Store token in localStorage for frontend auth guard
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        }
+      })
+    );
   }
 
   logout(): void {
+    // Remove token from localStorage
+    localStorage.removeItem('token');
+    // Also clear cookie
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   }
 

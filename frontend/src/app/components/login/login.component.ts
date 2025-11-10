@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -76,7 +76,8 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   onSubmit() {
@@ -89,8 +90,11 @@ export class LoginComponent {
     this.error = '';
 
     this.authService.login(this.email, this.password).subscribe({
-      next: () => {
-        this.router.navigate(['/shows']);
+      next: (response) => {
+        // Redirect to return URL if available, otherwise to /shows
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/shows';
+        // Use navigateByUrl which handles absolute paths correctly
+        this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
         this.error = err.error?.error || 'Login failed';

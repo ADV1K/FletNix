@@ -9,8 +9,8 @@ export const routes: Routes = [
   { path: '', redirectTo: '/shows', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'shows', component: ShowListComponent, /*canActivate: [authGuard]*/ },
-  { path: 'shows/:id', component: ShowDetailComponent, /*canActivate: [authGuard]*/ },
+  { path: 'shows', component: ShowListComponent, canActivate: [authGuard] },
+  { path: 'shows/:id', component: ShowDetailComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '/shows' },
 ];
 

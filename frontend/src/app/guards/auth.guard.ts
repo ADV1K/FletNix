@@ -4,22 +4,15 @@ import { Router, CanActivateFn } from '@angular/router';
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   
-  // Check if token exists in cookie
-  const token = getCookie('token');
+  // Check if token exists in localStorage (cookie is httpOnly and can't be read by JS)
+  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
   
   if (!token) {
-    router.navigate(['/login']);
+    // Store the attempted URL for redirect after login
+    router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }
   
   return true;
 };
-
-function getCookie(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-  return null;
-}
 

@@ -56,19 +56,17 @@ export class AppComponent {
   }
 
   checkAuth() {
-    // Simple check - in real app, use a service
-    const token = this.getCookie('token');
+    // Check localStorage for token (cookie is httpOnly and can't be read by JS)
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
     this.isAuthenticated = !!token;
   }
 
-  getCookie(name: string): string | null {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
-  }
-
   logout() {
+    // Remove token from localStorage
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('token');
+    }
+    // Also clear cookie
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     this.isAuthenticated = false;
     window.location.href = '/login';
